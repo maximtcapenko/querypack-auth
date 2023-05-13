@@ -12,29 +12,32 @@ namespace QueryPack.Auth.Extensions
     public static class InterceptorBuilderExtensions
     {
         /// <summary>
-        /// Validates if user is authenticated before targer method call
+        /// Checks whether the user is authenticated before calling the target method
         /// </summary>
         public static IInterceptorBuilder<TContext, TTarget> IsAuthenticated<TContext, TTarget>(
             this IInterceptorBuilder<TContext, TTarget> self, Expression<Func<TTarget, Delegate>> inputMethod)
          where TContext : class, IDependencyContext
          where TTarget : class
         {
-            var resolver = new MethodInfoResolver(typeof(TTarget));
-            var inputMethodInfo = resolver.Resolve(inputMethod);
+            var inputMethodInfo = MethodInfoResolver.Resolve<TTarget>(inputMethod);
             var inputParameters = inputMethodInfo.GetParameters().Select(e => Expression.Parameter(e.ParameterType));
-            var genericArgTypes = inputMethod.Parameters.Concat(inputParameters).Select(e => e.Type).Concat(new[] { inputMethodInfo.ReturnParameter.ParameterType });
+            var genericArgTypes = inputMethod.Parameters.Concat(inputParameters).Select(e => e.Type)
+                                                        .Concat(new[] { inputMethodInfo.ReturnParameter.ParameterType });
 
             var callExpression = Expression.Call(inputMethod.Parameters.First(), inputMethodInfo, inputParameters);
             var callLambda = Expression.Lambda(callExpression, inputParameters);
             var lambda = Expression.Lambda(callLambda, Expression.Parameter(genericArgTypes.First()));
 
-            // Find and registeration prepare method
-            var onMethodExecutingGenericParameters = inputMethodInfo.GetParameters().Select(e => e.ParameterType).Concat(new[] { inputMethodInfo.ReturnParameter.ParameterType });
-            var onMethodExecuting = self.GetType().GetMethods().FirstOrDefault(e => e.Name == nameof(IInterceptorBuilder<TContext, TTarget>.OnMethodExecuting) && e.GetGenericArguments().Count() == onMethodExecutingGenericParameters.Count());
+            // Find and prepare registeration method
+            var onMethodExecutingGenericParameters = inputMethodInfo.GetParameters().Select(e => e.ParameterType)
+                                                                    .Concat(new[] { inputMethodInfo.ReturnParameter.ParameterType });
+            var onMethodExecuting = self.GetType().GetMethods()
+                .FirstOrDefault(e => e.Name == nameof(IInterceptorBuilder<TContext, TTarget>.OnMethodExecuting) && e.GetGenericArguments().Count() == onMethodExecutingGenericParameters.Count());
             var onMethodExecutingGeneric = onMethodExecuting.MakeGenericMethod(onMethodExecutingGenericParameters.ToArray());
             // Find and prepare handler method
             var isAuthenticatedGenericArgs = new Type[] { typeof(TContext) }.Concat(genericArgTypes);
-            var isAuthenticated = typeof(AccessHelpers).GetMethods().FirstOrDefault(e => e.Name == nameof(AccessHelpers.IsAuthenticated) && e.GetGenericArguments().Count() == isAuthenticatedGenericArgs.Count());
+            var isAuthenticated = typeof(AccessHelpers).GetMethods()
+                .FirstOrDefault(e => e.Name == nameof(AccessHelpers.IsAuthenticated) && e.GetGenericArguments().Count() == isAuthenticatedGenericArgs.Count());
             var isAuthenticatedGeneric = isAuthenticated.MakeGenericMethod(isAuthenticatedGenericArgs.ToArray());
             // Prepare handler params
             var invoker = typeof(IMethodInvoker<>).MakeGenericType(inputMethodInfo.ReturnType);

@@ -1,5 +1,4 @@
 using System.Security.Principal;
-using QueryPack.DispatchProxy;
 
 namespace QueryPack.Auth.Examples
 {

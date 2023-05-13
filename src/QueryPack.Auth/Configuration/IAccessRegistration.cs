@@ -6,16 +6,16 @@ namespace QueryPack.Auth.Configuration
     public interface IAccessRegistration
     {
         /// <summary>
-        /// Registers default principal resolver <see cref="IPrincipalResolver"/>
+        /// Adds a default principal resolver to the DI container <see cref="IPrincipalResolver"/>
         /// </summary>
         IAccessRegistration AddPrincipalResolver<TResolver>() where TResolver : class, IPrincipalResolver;
         /// <summary>
-        /// Registers dependency context <see cref="IDependencyContext"/>
+        /// Adds a dependency context to the DI container <see cref="IDependencyContext"/>
         /// </summary>
         /// <typeparam name="TContext"></typeparam>
         IAccessRegistration AddContext<TContext>() where TContext : class, IDependencyContext;
         /// <summary>
-        /// Configures interception logic
+        /// Configures interception components
         /// </summary>
         /// <typeparam name="TContext"></typeparam>
         /// <typeparam name="TAuditable"></typeparam>

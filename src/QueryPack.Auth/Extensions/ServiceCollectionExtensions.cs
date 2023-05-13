@@ -1,6 +1,7 @@
 namespace QueryPack.Auth.Extensions
 {
     using System;
+    using System.Linq;
     using Configuration;
     using Configuration.Impl;
     using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +12,7 @@ namespace QueryPack.Auth.Extensions
     public static class ServiceCollectionExtensions
     {
         /// <summary>
-        /// Add access components to DI container
+        /// Adds access control components to the DI container
         /// </summary>
         /// <param name="self"></param>
         /// <param name="registrationBuilder"></param>
@@ -20,8 +21,22 @@ namespace QueryPack.Auth.Extensions
         {
             var registration = new AccessRegistrationImpl(self);
             registrationBuilder(registration);
+            ValidateRegestry(self);
 
             return self;
+        }
+
+        private static void ValidateRegestry(IServiceCollection services)
+        {
+            // Check if IDependencyContext is registered
+            var dependencyContext = services.FirstOrDefault(e => e.ServiceType.GetInterface(nameof(IDependencyContext)) != null);
+            if(dependencyContext == null)
+                throw new ArgumentNullException(nameof(IDependencyContext));
+
+            // Check if IPrincipalResolver is registered
+             var principalResolver = services.FirstOrDefault(e => e.ServiceType == typeof(IPrincipalResolver));
+            if(principalResolver == null)
+                throw new ArgumentNullException(nameof(IPrincipalResolver));
         }
     }
 }

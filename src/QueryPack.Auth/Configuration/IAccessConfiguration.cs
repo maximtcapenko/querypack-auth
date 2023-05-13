@@ -1,7 +1,7 @@
 namespace QueryPack.Auth.Configuration
 {
     /// <summary>
-    /// Configures access for user defined types
+    /// Configures access control
     /// </summary>
     /// <typeparam name="TContext"></typeparam>
     /// <typeparam name="TAuditable"></typeparam>

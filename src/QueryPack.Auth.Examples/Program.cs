@@ -23,7 +23,6 @@
            {
                services.AddTransient<IEntityService, EntityService>();
                services.ConfigureAccess(regestry =>
-            
                  regestry.AddContext<AccessContext>()
                          .AddPrincipalResolver<LocalPrincipalResolver>()
                          .AccessFor(new EntityAccessConfiguration()));

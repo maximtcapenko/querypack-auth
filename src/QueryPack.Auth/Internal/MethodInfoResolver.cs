@@ -7,11 +7,12 @@ namespace QueryPack.Auth.Internal
     internal class MethodInfoResolver : ExpressionVisitor
     {
         private MethodInfo _methodInfo;
-        private readonly Type _declaringType;
 
-        public MethodInfoResolver(Type declaringType)
+        private readonly Type _targetType;
+
+        protected MethodInfoResolver(Type targetType)
         {
-            _declaringType = declaringType;
+            _targetType = targetType;
         }
 
         public MethodInfo Resolve(Expression method)
@@ -20,35 +21,35 @@ namespace QueryPack.Auth.Internal
             return _methodInfo;
         }
 
-        protected override Expression VisitUnary(UnaryExpression node)
-        {
-            return base.VisitUnary(node);
-        }
+        public static MethodInfo Resolve<T>(Expression method) where T : class
+             => new MethodInfoResolver(typeof(T)).Resolve(method);
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            var t = node.Value.GetType();
-            if (node.Value is MethodInfo del)
+            if (_methodInfo == null)
             {
-                if (del.DeclaringType == _declaringType)
+                if (node.Value is MethodInfo methodInfo)
                 {
-                    _methodInfo = del;
+                    if (methodInfo.DeclaringType == _targetType)
+                    {
+                        _methodInfo = methodInfo;
+                    }
                 }
             }
+
             return base.VisitConstant(node);
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            var m = node.Method;
-            if (node.Method.DeclaringType == _declaringType)
+            if (_methodInfo == null)
             {
-                _methodInfo = node.Method;
-            }
-            else
-            {
-                Visit(node.Object);
-
+                if (node.Method?.DeclaringType == _targetType)
+                {
+                    _methodInfo = node.Method;
+                }
+                else
+                    Visit(node.Object);
             }
 
             return base.VisitMethodCall(node);
