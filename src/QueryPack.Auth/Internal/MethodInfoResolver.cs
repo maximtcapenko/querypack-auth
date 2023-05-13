@@ -7,7 +7,6 @@ namespace QueryPack.Auth.Internal
     internal class MethodInfoResolver : ExpressionVisitor
     {
         private MethodInfo _methodInfo;
-        private MethodCallExpression _expression;
         private readonly Type _declaringType;
 
         public MethodInfoResolver(Type declaringType)

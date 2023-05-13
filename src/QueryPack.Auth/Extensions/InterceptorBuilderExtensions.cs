@@ -6,6 +6,9 @@ namespace QueryPack.Auth.Extensions
     using DispatchProxy;
     using Internal;
 
+    /// <summary>
+    /// Interceptor Builder Extensions
+    /// </summary>
     public static class InterceptorBuilderExtensions
     {
         /// <summary>
@@ -40,17 +43,12 @@ namespace QueryPack.Auth.Extensions
 
             var isAuthenticatedGenericFunc = GetDelegateType(isAuthenticatedGenericArgsList.Count()).MakeGenericType(isAuthenticatedGenericArgsList.ToArray());
             var isAuthenticatedGenericDelegate = isAuthenticatedGeneric.CreateDelegate(isAuthenticatedGenericFunc);
-            onMethodExecutingGeneric.Invoke(self, new object[] { lambda, isAuthenticatedGenericDelegate});
-            
+            onMethodExecutingGeneric.Invoke(self, new object[] { lambda, isAuthenticatedGenericDelegate });
+
             return self;
         }
 
-        public static Expression BuildLambda<T1, T2>(Expression body, ParameterExpression parameter)
-        {
-            return Expression.Lambda<Func<T1, T2>>(body, parameter);
-        }
-
-        public static Type GetDelegateType(int args)
+        private static Type GetDelegateType(int args)
         => args switch
         {
             1 => typeof(Func<>),

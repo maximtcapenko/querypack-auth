@@ -1,10 +1,13 @@
 namespace QueryPack.Auth.Configuration
 {
     /// <summary>
-    /// Registers audit components
+    /// Registers access components
     /// </summary>
     public interface IAccessRegistration
     {
+        /// <summary>
+        /// Registers default principal resolver <see cref="IPrincipalResolver"/>
+        /// </summary>
         IAccessRegistration AddPrincipalResolver<TResolver>() where TResolver : class, IPrincipalResolver;
         /// <summary>
         /// Registers dependency context <see cref="IDependencyContext"/>

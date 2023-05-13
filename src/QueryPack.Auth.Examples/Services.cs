@@ -29,9 +29,8 @@ namespace QueryPack.Auth.Examples
         public IPrincipal Resolve()
         {
             var myIdentity = new GenericIdentity("MyIdentity");
-            String[] myStringArray = { "Manager", "Teller" };
-            var myPrincipal =
-                new GenericPrincipal(myIdentity, myStringArray);
+             var myPrincipal =
+                new GenericPrincipal(myIdentity, null);
 
             return myPrincipal;
         }
