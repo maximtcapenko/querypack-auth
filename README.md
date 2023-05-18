@@ -21,8 +21,8 @@ class EntityAccessConfiguration : IAccessConfiguration<AccessContext, IEntitySer
 3. Register access configuration in `Program` 
 ```c#
     services.AddTransient<IEntityService, EntityService>();
-    services.ConfigureAccess(regestry =>
-        regestry.AddContext<AccessContext>()
+    services.ConfigureAccess(registry =>
+        registry.AddContext<AccessContext>()
                 .AddPrincipalResolver<LocalPrincipalResolver>()
                 .AccessFor(new EntityAccessConfiguration()));
 ```
